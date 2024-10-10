@@ -1,26 +1,42 @@
 import React from "react";
+import { useEffect, useState, useRef } from "react";
 import TrashIcon from "./assets/red-trash-can-icon.png";
+import api from "../../services/api";
+import { create } from "domain";
+
 const Home: React.FC = () => {
-  const users = [
-    {
-      id: "2312312",
-      name: "Jnasd",
-      age: "22",
-      email: "jnasc@gmail.com",
-    },
-    {
-      id: "3124124",
-      name: "sdasss",
-      age: "32",
-      email: "gfdasd@gmail.com",
-    },
-    {
-      id: "2312312",
-      name: "Jnasd",
-      age: "51",
-      email: "sgaszx@gmail.com",
-    },
-  ];
+  interface User {
+    id: string;
+    name: string;
+    email: string;
+    age: string;
+  }
+  const [users, setUsers] = useState<User[]>([]);
+
+  const inputName = useRef<HTMLInputElement>(null);
+  const inputAge = useRef<HTMLInputElement>(null);
+  const inputEmail = useRef<HTMLInputElement>(null);
+
+  async function getUsers() {
+    const usersFromAPI = await api.get("/usuarios");
+    setUsers(usersFromAPI.data);
+  }
+
+  async function createUser() {
+    if (inputName.current && inputAge.current && inputEmail.current) {
+      await api.post("/usuarios", {
+        name: inputName.current.value,
+        age: inputAge.current.value,
+        email: inputEmail.current.value,
+      });
+      getUsers();
+    }
+  }
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
   return (
     <>
       <div className="bg-gradient-to-b from-slate-800 to-orange-200 h-screen w-screen">
@@ -32,20 +48,26 @@ const Home: React.FC = () => {
               type="text"
               placeholder="Nome"
               className="p-2 rounded-sm bg-slate-200"
+              ref={inputName}
             />
             <input
               name="email"
               type="email"
               placeholder="E-mail"
               className="p-2 rounded-sm bg-slate-200"
+              ref={inputEmail}
             />
             <input
               name="age"
               type="number"
               placeholder="Idade"
               className="p-2 rounded-sm bg-slate-200"
+              ref={inputAge}
             />
-            <button className="bg-slate-700 p-4 text-white rounded-md">
+            <button
+              onClick={createUser}
+              className="bg-slate-700 p-4 text-white rounded-md"
+            >
               Registrar
             </button>
           </form>
