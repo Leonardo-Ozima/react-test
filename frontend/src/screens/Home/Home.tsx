@@ -33,6 +33,11 @@ const Home: React.FC = () => {
     }
   }
 
+  async function deleteUser(id: string) {
+    await api.delete(`/usuarios/${id}`);
+    getUsers();
+  }
+
   useEffect(() => {
     getUsers();
   }, []);
@@ -88,7 +93,7 @@ const Home: React.FC = () => {
                   Email: <span className="font-normal">{user.email}</span>
                 </p>
               </div>
-              <button className="p-4">
+              <button className="p-4" onClick={() => deleteUser(user.id)}>
                 <img src={TrashIcon} alt="Delete" className="h-6 " />
               </button>
             </div>
